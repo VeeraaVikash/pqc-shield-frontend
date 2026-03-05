@@ -1,88 +1,38 @@
 'use client';
-
-import { PageHeader, Card, Badge, StatusDot } from '@/components/ui';
-import { QOS_SLAS, FAILOVER_MECHANISMS, ANOMALIES, CLUSTER_NODES } from '@/constants';
-import { getNodeHealth, getStatusColor } from '@/lib/utils';
-
+import { api } from '@/lib/api';
+import { useAPI } from '@/lib/useAPI';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import StatCard from '@/components/ui/StatCard';
+import PageHeader from '@/components/ui/PageHeader';
+import LoadingState from '@/components/ui/LoadingState';
 export default function QoSPage() {
-  return (
-    <div>
-      <PageHeader title="QoS & Resilience" subtitle="Quality of service monitoring, failover status, and anomaly detection" />
-
-      {/* SLA Dashboard */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-        {QOS_SLAS.map((s, i) => (
-          <Card key={i}>
-            <p className="text-[10px] text-slate-500 uppercase font-semibold">{s.label}</p>
-            <p className="text-[28px] sm:text-[32px] font-bold mt-1.5 mb-1" style={{ fontFamily: 'var(--font-display)', color: s.color }}>{s.value}</p>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-slate-500">Target: {s.target}</span>
-              <Badge variant={s.met ? 'success' : 'danger'}>{s.met ? 'MET' : 'BREACH'}</Badge>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
-        {/* Failover */}
-        <Card>
-          <h3 className="text-sm font-semibold text-slate-200 mb-4">Failover & Fallback Status</h3>
-          <div className="space-y-2">
-            {FAILOVER_MECHANISMS.map((f, i) => (
-              <div key={i} className="flex items-center justify-between px-3 py-3 bg-surface-base/40 rounded-lg border border-slate-800/40">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <StatusDot status="active" />
-                  <div className="min-w-0">
-                    <p className="text-[12px] text-slate-200 font-medium truncate">{f.name}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Last: {f.lastTriggered}</p>
-                  </div>
-                </div>
-                <div className="text-right flex-shrink-0 ml-3">
-                  <Badge variant="success">ARMED</Badge>
-                  <p className="text-[10px] text-slate-500 mt-1">{f.triggers24h} / 24h</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Anomaly Detection */}
-        <Card>
-          <h3 className="text-sm font-semibold text-slate-200 mb-4">Anomaly Detection</h3>
-          <div className="space-y-2">
-            {ANOMALIES.map((a, i) => (
-              <div key={i} className="flex items-center justify-between px-3 py-3 bg-surface-base/40 rounded-lg"
-                style={{ border: `1px solid ${a.severity === 'critical' ? 'rgba(239,68,68,0.2)' : 'rgba(51,65,85,0.3)'}` }}>
-                <div className="min-w-0">
-                  <p className="text-[12px] text-slate-200 font-medium">{a.type}</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">Last: {a.lastSeen} · Count: {a.count}</p>
-                </div>
-                <Badge variant={a.severity === 'critical' ? 'danger' : a.severity === 'warning' ? 'warning' : 'default'}>
-                  {a.action}
-                </Badge>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* Cluster Health */}
-      <Card>
-        <h3 className="text-sm font-semibold text-slate-200 mb-4">Cluster Health Matrix</h3>
-        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
-          {CLUSTER_NODES.map((node, i) => {
-            const health = getNodeHealth(node);
-            const color = getStatusColor(health);
-            return (
-              <div key={i} className="p-2.5 rounded-lg text-center"
-                style={{ backgroundColor: `${color}10`, border: `1px solid ${color}20` }}>
-                <StatusDot status={health} />
-                <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono mt-1 break-all leading-tight">{node}</p>
-              </div>
-            );
-          })}
+  const {data:d, loading} = useAPI(api.getCommandCenter, 5000);
+  if (loading && !d) return <LoadingState label="Loading QoS..."/>;
+  if (!d) return <div className="text-slate-500 py-20 text-center">Backend not reachable.</div>;
+  const qos=d.qos||{}, alerts=d.alerts_summary||{}, risk=d.risk||{}, sp=[99.9,99.9,99.95,99.97,99.97,99.97,99.97,99.97,99.97,99.97,99.97,99.97];
+  const stats=[{label:'Availability',value:(qos.availability||0)+'%',color:'#22c55e',sparkData:sp},{label:'MTTR',value:(qos.mttr_seconds||0)+'s',color:'#38bdf8',sparkData:sp},{label:'Failed 24h',value:qos.failed_handshakes_24h||0,color:'#ef4444',sparkData:sp}];
+  return (<>
+    <PageHeader title="Quality of Service" subtitle="SLA compliance">
+      <Badge variant={qos.status==='HEALTHY'?'success':qos.status==='DEGRADED'?'warning':'critical'}>{qos.status||'UNKNOWN'}</Badge>
+    </PageHeader>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">{stats.map((s,i)=><StatCard key={i} {...s}/>)}</div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <Card title="System Health">
+        <div className="space-y-3 py-2">
+          <div className="flex justify-between"><span className="text-sm text-slate-400">Status</span><Badge variant={d.system_status==='ALL SYSTEMS NOMINAL'?'success':'warning'}>{d.system_status}</Badge></div>
+          <div className="flex justify-between"><span className="text-sm text-slate-400">Open Alerts</span><span className="text-sm font-bold text-yellow-400">{alerts.open_alerts||0}</span></div>
+          <div className="flex justify-between"><span className="text-sm text-slate-400">Critical</span><span className="text-sm font-bold text-red-400">{alerts.critical||0}</span></div>
+          <div className="flex justify-between"><span className="text-sm text-slate-400">Fallbacks 24h</span><span className="text-sm font-bold text-orange-400">{qos.fallback_triggers_24h||0}</span></div>
+        </div>
+      </Card>
+      <Card title="Risk">
+        <div className="space-y-3 py-2">
+          <div className="flex justify-between"><span className="text-sm text-slate-400">Score</span><span className="text-sm font-bold" style={{color:risk.risk_level==='LOW'?'#22c55e':'#fbbf24'}}>{risk.risk_score}</span></div>
+          <div className="flex justify-between"><span className="text-sm text-slate-400">Level</span><Badge variant={risk.risk_level==='LOW'?'success':'warning'}>{risk.risk_level}</Badge></div>
+          <div className="flex justify-between"><span className="text-sm text-slate-400">Coverage</span><span className="text-sm text-white">{risk.factors?.policy_coverage||0}%</span></div>
         </div>
       </Card>
     </div>
-  );
+  </>);
 }

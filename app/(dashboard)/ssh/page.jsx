@@ -1,55 +1,75 @@
 'use client';
-
-import { PageHeader, Card, Badge, StatusDot, DataTable } from '@/components/ui';
-import { SSH_BASTIONS, SSH_SESSIONS } from '@/constants';
-import { getAlgoBadgeVariant } from '@/lib/utils';
-
+import { api } from '@/lib/api';
+import { useAPI } from '@/lib/useAPI';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import StatCard from '@/components/ui/StatCard';
+import PageHeader from '@/components/ui/PageHeader';
+import StatusDot from '@/components/ui/StatusDot';
+import DataTable from '@/components/ui/DataTable';
+import LoadingState from '@/components/ui/LoadingState';
 export default function SSHPage() {
-  const sessionColumns = [
-    { key: 'user', label: 'User', mono: true },
-    { key: 'bastion', label: 'Bastion', mono: true },
-    { key: 'target', label: 'Target Host', mono: true },
-    { label: 'Algorithm', render: (r) => <Badge variant={getAlgoBadgeVariant(r.algo)}>{r.algo}</Badge> },
-    { key: 'duration', label: 'Duration', mono: true },
-    { label: 'Status', render: (r) => <span className="flex items-center gap-1.5"><StatusDot status={r.status} />{r.status}</span> },
+  const {data:metrics} = useAPI(api.getSSHMetrics, 5000);
+  const {data:bastions} = useAPI(api.getSSHBastions, 5000);
+  const {data:sessions, loading} = useAPI(api.getSSHSessions, 5000);
+  if (loading && !bastions) return <LoadingState label="Loading SSH bastions..."/>;
+  const m = metrics || {};
+  const sp=[200,220,240,260,280,300,310,320,330,340,340,340];
+  const stats=[
+    {label:'Bastions Active',value:m.bastions_active||0,color:'#38bdf8',sparkData:sp},
+    {label:'Active Sessions',value:m.total_active_sessions||0,color:'#22c55e',sparkData:sp},
+    {label:'PQC Coverage',value:(m.pqc_percentage||0)+'%',color:'#a78bfa',sparkData:sp},
+    {label:'Auth Latency',value:(m.avg_auth_latency_ms||0)+'ms',color:'#fbbf24',sparkData:sp},
   ];
 
-  return (
-    <div>
-      <PageHeader title="SSH Integration" subtitle="Agent/bastion model with PQC-secured SSH authentication" />
+  const sessionCols=[
+    {key:'session_id',label:'Session',mono:true,render:r=><span className="text-[10px]">{(r.session_id||'').slice(0,12)}</span>},
+    {key:'user',label:'User',mono:true},
+    {key:'bastion',label:'Bastion'},
+    {key:'target',label:'Target',mono:true},
+    {key:'auth_algorithm',label:'Auth Algo',mono:true},
+    {key:'kex_algorithm',label:'KEX',mono:true},
+    {key:'mode',label:'Mode',render:r=><Badge variant={r.mode==='PQC-Only'?'success':r.mode==='Hybrid'?'info':'warning'}>{r.mode}</Badge>},
+    {key:'duration',label:'Duration'},
+    {key:'status',label:'Status',render:r=><Badge variant={r.status==='active'?'success':'default'}>{r.status}</Badge>},
+  ];
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-        {SSH_BASTIONS.map((b) => (
-          <Card key={b.id} hoverable>
-            <div className="flex items-center gap-2 mb-3">
-              <StatusDot status={b.status} />
-              <span className="text-[12px] font-semibold text-slate-200 font-mono">{b.id}</span>
-            </div>
-            <p className="text-[10px] text-slate-500 font-mono break-all mb-2">{b.host}</p>
-            {[
-              ['Region', b.region],
-              ['Sessions', b.sessions],
-              ['Uptime', b.uptime],
-            ].map(([label, val], i) => (
-              <div key={i} className="flex justify-between py-0.5">
-                <span className="text-[11px] text-slate-500">{label}</span>
-                <span className={`text-[11px] font-mono ${label === 'Sessions' ? 'text-sky-400 font-semibold' : label === 'Uptime' ? 'text-green-400 font-semibold' : 'text-slate-400'}`}>
-                  {val}
-                </span>
-              </div>
-            ))}
-            <div className="flex justify-between py-0.5 mt-0.5">
-              <span className="text-[11px] text-slate-500">Algorithm</span>
-              <Badge variant={getAlgoBadgeVariant(b.algo)}>{b.algo}</Badge>
-            </div>
-          </Card>
-        ))}
+  return (<>
+    <PageHeader title="SSH Bastions" subtitle="PQC-authenticated jump hosts">
+      <div className="flex items-center gap-2">
+        <Badge variant="info">{m.primary_auth_algo||'--'}</Badge>
+        <Badge variant="info">{m.primary_kex_algo||'--'}</Badge>
       </div>
+    </PageHeader>
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">{stats.map((s,i)=><StatCard key={i} {...s}/>)}</div>
 
-      <Card>
-        <h3 className="text-sm font-semibold text-slate-200 mb-4">Active SSH Sessions</h3>
-        <DataTable columns={sessionColumns} data={SSH_SESSIONS} />
-      </Card>
+    {/* Bastion Cards */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      {(bastions||[]).map(b=>(
+        <Card key={b.id}>
+          <div className="flex items-start justify-between mb-3">
+            <div className="text-[11px] font-mono text-slate-400">{b.id}</div>
+            <StatusDot status={b.status==='active'?'active':'warning'}/>
+          </div>
+          <div className="text-sm font-semibold text-white mb-1">{b.host.split('.')[0]}</div>
+          <div className="text-[11px] text-slate-500 mb-3">{b.region}</div>
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-[11px]"><span className="text-slate-500">Sessions</span><span className="text-white font-semibold">{b.active_sessions}</span></div>
+            <div className="flex justify-between text-[11px]"><span className="text-slate-500">Auth Algo</span><span className="text-violet-400 font-mono">{b.auth_algorithm}</span></div>
+            <div className="flex justify-between text-[11px]"><span className="text-slate-500">KEX</span><span className="text-sky-400 font-mono">{b.kex_algorithm}</span></div>
+            <div className="flex justify-between text-[11px]"><span className="text-slate-500">Mode</span><Badge variant={b.mode==='PQC-Only'?'success':'info'}>{b.mode}</Badge></div>
+            <div className="flex justify-between text-[11px]"><span className="text-slate-500">CPU</span><span className="text-white">{b.cpu_usage}%</span></div>
+            <div className="flex justify-between text-[11px]"><span className="text-slate-500">Uptime</span><span className="text-emerald-400">{b.uptime}</span></div>
+            <div className="flex justify-between text-[11px]"><span className="text-slate-500">PQC</span><span className="text-violet-400 font-semibold">{b.pqc_percentage}%</span></div>
+          </div>
+        </Card>
+      ))}
     </div>
-  );
+
+    {/* Sessions Table */}
+    <Card title={'Active Sessions ('+((sessions||[]).length)+')'}>
+      {sessions&&sessions.length>0?<DataTable columns={sessionCols} data={sessions}/>:<p className="text-slate-500 text-sm py-4">No active sessions</p>}
+    </Card>
+    <div className="mt-2 text-[10px] text-slate-600 text-center">Real-time from backend &middot; Refresh 5s</div>
+  </>);
 }

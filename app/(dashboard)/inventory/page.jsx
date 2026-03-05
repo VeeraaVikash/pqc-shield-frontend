@@ -1,65 +1,22 @@
 'use client';
-
-import { useState } from 'react';
-import { RefreshCw } from 'lucide-react';
-import { PageHeader, Card, Badge, StatusDot, DataTable, FilterTabs, ProgressBar } from '@/components/ui';
-import { INVENTORY_ASSETS, INVENTORY_SUMMARY } from '@/constants';
-import { getAlgoBadgeVariant } from '@/lib/utils';
-
+import { api } from '@/lib/api';
+import { useAPI } from '@/lib/useAPI';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import StatCard from '@/components/ui/StatCard';
+import PageHeader from '@/components/ui/PageHeader';
+import DataTable from '@/components/ui/DataTable';
+import LoadingState from '@/components/ui/LoadingState';
 export default function InventoryPage() {
-  const [filterIdx, setFilterIdx] = useState(0);
-
-  const columns = [
-    { key: 'id', label: 'ID', mono: true },
-    { key: 'name', label: 'Hostname', mono: true },
-    { key: 'type', label: 'Type' },
-    { label: 'Algorithm', mono: true, render: (row) => <Badge variant={getAlgoBadgeVariant(row.algo)}>{row.algo}</Badge> },
-    { label: 'Status', render: (row) => <span className="flex items-center gap-1.5"><StatusDot status={row.status} />{row.status}</span> },
-    { key: 'expiry', label: 'Cert Expiry', mono: true, render: (row) => (
-      <span className={row.expiry === '2026-02-22' ? 'text-red-400' : 'text-slate-400'}>{row.expiry}</span>
-    )},
-    { label: 'PQC Readiness', render: (row) => (
-      <div className="flex items-center gap-2 min-w-[120px]">
-        <ProgressBar value={row.readiness} color={row.readiness >= 90 ? '#22c55e' : row.readiness >= 50 ? '#fbbf24' : '#ef4444'} height={5} />
-        <span className="text-[11px] text-slate-400 font-mono min-w-[32px]">{row.readiness}%</span>
-      </div>
-    )},
-  ];
-
-  return (
-    <div>
-      <PageHeader
-        title="Inventory & Readiness"
-        subtitle="PQC migration status across all managed endpoints"
-        actions={
-          <>
-            <button className="px-3 py-1.5 rounded-lg border border-sky-400/30 bg-sky-400/8 text-sky-400 text-[11px] font-semibold flex items-center gap-1.5 hover:bg-sky-400/15 transition-colors">
-              <RefreshCw size={13} /> Sync Now
-            </button>
-            <button className="px-3 py-1.5 rounded-lg border border-slate-700/50 text-slate-400 text-[11px] font-semibold hover:text-slate-300 transition-colors">
-              Export CSV
-            </button>
-          </>
-        }
-      />
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-        {INVENTORY_SUMMARY.map((c, i) => (
-          <Card key={i}>
-            <p className="text-[10px] text-slate-500 uppercase tracking-wide font-semibold">{c.label}</p>
-            <p className="text-xl sm:text-2xl font-bold mt-1" style={{ fontFamily: 'var(--font-display)', color: c.color }}>{c.value}</p>
-            <p className="text-[11px] text-slate-500">{c.sub}</p>
-          </Card>
-        ))}
-      </div>
-
-      <Card>
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-          <h3 className="text-sm font-semibold text-slate-200">Endpoint Inventory</h3>
-          <FilterTabs tabs={['All', 'PQC Ready', 'Hybrid', 'Legacy']} activeIdx={filterIdx} onChange={setFilterIdx} />
-        </div>
-        <DataTable columns={columns} data={INVENTORY_ASSETS} />
-      </Card>
-    </div>
-  );
+  const {data:ov} = useAPI(api.getInventoryOverview, 10000);
+  const {data:assets, loading} = useAPI(api.getInventoryAssets, 10000);
+  if (loading && !ov) return <LoadingState label="Loading inventory..."/>;
+  const o=ov||{}, sp=[40,42,44,46,48,50,50,50,50,50,50,50];
+  const stats=[{label:'Total',value:o.total_assets||0,color:'#e2e8f0',sparkData:sp},{label:'PQC Ready',value:o.pqc_ready||0,color:'#22c55e',sparkData:sp},{label:'Hybrid',value:o.hybrid||0,color:'#fbbf24',sparkData:sp},{label:'Legacy',value:o.legacy||0,color:'#ef4444',sparkData:sp}];
+  const cols=[{key:'hostname',label:'Host',mono:true},{key:'type',label:'Type'},{key:'algorithm',label:'Algorithm',mono:true},{key:'status',label:'Status',render:r=><Badge variant={r.status==='active'?'success':'warning'}>{r.status}</Badge>},{key:'pqc_readiness',label:'PQC %'},{key:'cert_expiry',label:'Expiry'}];
+  return (<>
+    <PageHeader title="Asset Inventory" subtitle="Endpoint monitoring"/>
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">{stats.map((s,i)=><StatCard key={i} {...s}/>)}</div>
+    <Card title="Assets">{assets?<DataTable columns={cols} data={assets}/>:<p className="text-slate-500 py-4">No assets</p>}</Card>
+  </>);
 }
