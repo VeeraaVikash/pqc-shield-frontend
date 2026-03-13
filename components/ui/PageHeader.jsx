@@ -1,4 +1,7 @@
-export default function PageHeader({ title, subtitle, actions }) {
+export default function PageHeader({ title, subtitle, actions, children }) {
+  // Support both 'actions' and 'children' for flexibility
+  const content = actions || children;
+
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-6">
       <div>
@@ -12,8 +15,8 @@ export default function PageHeader({ title, subtitle, actions }) {
           <p className="text-[12px] text-slate-500 mt-0.5">{subtitle}</p>
         )}
       </div>
-      {actions && (
-        <div className="flex items-center gap-2 flex-wrap">{actions}</div>
+      {content && (
+        <div className="flex items-center gap-2 flex-wrap">{content}</div>
       )}
     </div>
   );

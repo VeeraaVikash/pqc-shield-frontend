@@ -1,4 +1,4 @@
-# PQC Shield — Enterprise VPN Platform
+# Quansec's PQC — Enterprise VPN Platform
 
 > Post-Quantum Cryptography management platform for 4 protocol integrations: TLS, SSH, IPsec, WPA3.
 

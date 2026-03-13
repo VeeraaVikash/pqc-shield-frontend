@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
-export const metadata = { title: 'Documentation | PQC Shield' };
+export const metadata = { title: "Documentation | Quansec's PQC" };
 
 export default function DocsLayout({ children }) {
   return (
@@ -14,7 +14,7 @@ export default function DocsLayout({ children }) {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center">
                 <span className="text-xs font-extrabold text-white">PQ</span>
               </div>
-              <span className="text-sm font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>PQC Shield Docs</span>
+              <span className="text-sm font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>Quansec's PQC Docs</span>
             </div>
           </div>
           <div className="flex gap-3">

@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }) {
         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center animate-pulse">
           <span className="text-sm font-extrabold text-white">PQ</span>
         </div>
-        <div className="text-slate-500 text-sm">Initializing PQC Shield...</div>
+        <div className="text-slate-500 text-sm">Initializing Quansec's PQC...</div>
       </div>
     </div>
   );

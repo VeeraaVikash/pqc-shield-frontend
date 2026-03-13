@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quansec's PQC — Complete Documentation</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #1e1e1e;
+            --bg-code: #161616;
+            --bg-table-header: #1a1a2e;
+            --border: #2a2a2a;
+            --border-glow: #3b3b50;
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666;
+            --accent-orange: #e8734a;
+            --accent-blue: #6b9eff;
+            --accent-green: #4ade80;
+            --accent-amber: #fbbf24;
+            --accent-red: #f87171;
+            --accent-violet: #a78bfa;
+            --accent-cyan: #22d3ee;
+            --accent-pink: #f472b6;
+            --gradient-1: linear-gradient(135deg, #e8734a 0%, #d44a1a 100%);
+            --gradient-2: linear-gradient(135deg, #6b9eff 0%, #4a7adf 100%);
+            --gradient-hero: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            z-index: 100;
+            padding: 24px 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .sidebar-logo h2 {
+            font-size: 18px;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-logo p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 400;
+            transition: all 0.15s;
+            border-left: 2px solid transparent;
+        }
+
+        .sidebar nav a:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+            border-left-color: var(--accent-orange);
+        }
+
+        .sidebar nav a .num {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            min-width: 20px;
+        }
+
+        .main {
+            margin-left: 280px;
+            max-width: 900px;
+            padding: 40px 60px 120px;
+        }
+
+        .hero {
+            background: var(--gradient-hero);
+            border-radius: 16px;
+            padding: 48px;
+            margin-bottom: 48px;
+            border: 1px solid var(--border-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(232, 115, 74, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, #ccc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero .subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .hero .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 20px;
+            padding: 6px 14px;
+            background: rgba(232, 115, 74, 0.1);
+            border: 1px solid rgba(232, 115, 74, 0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--accent-orange);
+            font-weight: 500;
+        }
+
+        .section {
+            margin-bottom: 56px;
+            scroll-margin-top: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 .icon {
+            font-size: 20px;
+        }
+
+        h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin: 28px 0 12px;
+        }
+
+        h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-violet);
+            margin: 20px 0 8px;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            font-size: 14.5px;
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px;
+            font-size: 13px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead th {
+            background: var(--bg-table-header);
+            color: var(--text-primary);
+            font-weight: 600;
+            text-align: left;
+            padding: 10px 14px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        tbody td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-code);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12.5px;
+            color: var(--accent-orange);
+            border: 1px solid var(--border);
+        }
+
+        pre {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px 24px;
+            overflow-x: auto;
+            margin: 16px 0 24px;
+            font-size: 12.5px;
+            line-height: 1.7;
+        }
+
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: var(--text-secondary);
+        }
+
+        .info-box {
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 16px 0 20px;
+            font-size: 13.5px;
+            border-left: 3px solid;
+        }
+
+        .info-box.green {
+            background: rgba(74, 222, 128, 0.06);
+            border-left-color: var(--accent-green);
+        }
+
+        .info-box.amber {
+            background: rgba(251, 191, 36, 0.06);
+            border-left-color: var(--accent-amber);
+        }
+
+        .info-box.red {
+            background: rgba(248, 113, 113, 0.06);
+            border-left-color: var(--accent-red);
+        }
+
+        .info-box.blue {
+            background: rgba(107, 158, 255, 0.06);
+            border-left-color: var(--accent-blue);
+        }
+
+        .info-box .title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            margin: 16px 0 24px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--border-glow);
+        }
+
+        .card .label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .card .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card .desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .term {
+            display: inline-flex;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .term.green {
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--accent-green);
+        }
+
+        .term.amber {
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--accent-amber);
+        }
+
+        .term.red {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--accent-red);
+        }
+
+        .term.blue {
+            background: rgba(107, 158, 255, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .term.violet {
+            background: rgba(167, 139, 250, 0.1);
+            color: var(--accent-violet);
+        }
+
+        .term.cyan {
+            background: rgba(34, 211, 238, 0.1);
+            color: var(--accent-cyan);
+        }
+
+        ol,
+        ul {
+            padding-left: 20px;
+            margin: 8px 0 16px;
+        }
+
+        li {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        li strong {
+            color: var(--text-primary);
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: var(--border);
+            margin: 40px 0;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 24px;
+            }
+        }
+
+        @media print {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            body {
+                background: #fff;
+                color: #111;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h2>🛡️ Quansec's PQC</h2>
+            <p>Complete Documentation v1.0</p>
+        </div>
+        <nav>
+            <a href="#what"><span class="num">01</span> What Is Quansec's PQC?</a>
+            <a href="#why"><span class="num">02</span> Why Does It Exist?</a>
+            <a href="#terms"><span class="num">03</span> Key Terms Explained</a>
+            <a href="#arch"><span class="num">04</span> System Architecture</a>
+            <a href="#pipeline"><span class="num">05</span> The Data Pipeline</a>
+            <a href="#pages"><span class="num">06</span> Page-by-Page Breakdown</a>
+            <a href="#services"><span class="num">07</span> Backend Services</a>
+            <a href="#tables"><span class="num">08</span> Database Tables</a>
+            <a href="#api"><span class="num">09</span> API Endpoints</a>
+            <a href="#jobs"><span class="num">10</span> Scheduled Jobs</a>
+            <a href="#auth"><span class="num">11</span> Authentication Flow</a>
+            <a href="#stack"><span class="num">12</span> Technology Stack</a>
+            <a href="#algos"><span class="num">13</span> Algorithms &amp; Standards</a>
+            <a href="#datasrc"><span class="num">14</span> Live vs Simulated</a>
+            <a href="#risk"><span class="num">15</span> Risk Scoring Formula</a>
+            <a href="#deploy"><span class="num">16</span> Deployment Guide</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+
+        <!-- Hero -->
+        <div class="hero">
+            <h1>Quansec's PQC</h1>
+            <p class="subtitle">A line-by-line, concept-by-concept guide to everything Quansec's PQC does. Written so
+                anyone — technical or not — can understand the entire system.</p>
+            <div class="badge">📄 Complete Documentation • 16 Sections</div>
+        </div>
+
+        <!-- Section 1 -->
+        <div class="section" id="what">
+            <h2><span class="icon">🛡️</span> 1. What Is Quansec's PQC?</h2>
+            <p><strong>Quansec's PQC</strong> is a real-time monitoring and management platform for <strong>Post-Quantum
+                    Cryptography (PQC)</strong> across enterprise network protocols.</p>
+            <p>Think of it like a <strong>security operations center (SOC) dashboard</strong> — but specifically built
+                to track the migration from old encryption (RSA, ECDSA) to new quantum-resistant encryption (Kyber,
+                Dilithium).</p>
+
+            <h3>What It Does In Simple Terms</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="label">Monitor</div>
+                    <div class="value">📡</div>
+                    <div class="desc">Monitors every encrypted connection in your network (TLS, SSH, IPsec, VPN)</div>
+                </div>
+                <div class="card">
+                    <div class="label">Track</div>
+                    <div class="value">📊</div>
+                    <div class="desc">Tracks which connections use quantum-safe algorithms and which don't</div>
+                </div>
+                <div class="card">
+                    <div class="label">Alert</div>
+                    <div class="value">🚨</div>
+                    <div class="desc">Alerts you when something goes wrong (high failure rate, slow connections,
+                        classical fallbacks)</div>
+                </div>
+                <div class="card">
+                    <div class="label">Manage</div>
+                    <div class="value">🔑</div>
+                    <div class="desc">Manages encryption keys and their rotation lifecycle</div>
+                </div>
+                <div class="card">
+                    <div class="label">Enforce</div>
+                    <div class="value">📜</div>
+                    <div class="desc">Enforces policies like "All TLS gateways must use Kyber768 by June 2026"</div>
+                </div>
+                <div class="card">
+                    <div class="label">Report</div>
+                    <div class="value">📈</div>
+                    <div class="desc">Reports on compliance, risk, and service quality</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="section" id="why">
+            <h2><span class="icon">⚡</span> 2. Why Does It Exist?</h2>
+            <h3>The Quantum Threat</h3>
+            <p>Today's encryption (RSA, ECDSA) relies on math problems that regular computers can't solve quickly. But
+                <strong>quantum computers</strong> — which are being built right now by Google, IBM, and others — will
+                be able to break these in minutes.</p>
+
+            <div class="info-box red">
+                <div class="title">⏳ Timeline</div>
+                <strong>2024–2025:</strong> NIST finalized new quantum-resistant algorithms<br>
+                <strong>2025–2030:</strong> Organizations must migrate to these new algorithms<br>
+                <strong>2030+:</strong> Quantum computers may be powerful enough to break RSA-2048
+            </div>
+
+            <h3>The Problem Quansec's PQC Solves</h3>
+            <p>Imagine an enterprise with 10,000 servers. Each one uses encryption. To migrate them all to quantum-safe
+                algorithms, you need to:</p>
+            <ol>
+                <li><strong>Know</strong> which servers still use old algorithms → <span
+                        class="term blue">Inventory</span></li>
+                <li><strong>Monitor</strong> that new algorithms are working → <span class="term green">Telemetry</span>
+                </li>
+                <li><strong>Track</strong> connection success rates and latency → <span class="term cyan">TLS
+                        Dashboard</span></li>
+                <li><strong>Manage</strong> encryption keys → <span class="term violet">Key Vault</span></li>
+                <li><strong>Enforce</strong> migration policies → <span class="term amber">Policy Engine</span></li>
+                <li><strong>Alert</strong> when things break → <span class="term red">Alert Engine</span></li>
+                <li><strong>Report</strong> on overall security posture → <span class="term blue">Risk Score, QoS</span>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="section" id="terms">
+            <h2><span class="icon">📖</span> 3. Key Terms Explained</h2>
+
+            <h3>Cryptography Terms</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Term</th>
+                        <th>What It Means</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>PQC</strong></td>
+                        <td>Post-Quantum Cryptography — new encryption algorithms designed to resist quantum computer
+                            attacks</td>
+                        <td>Kyber, Dilithium</td>
+                    </tr>
+                    <tr>
+                        <td><strong>KEM</strong></td>
+                        <td>Key Encapsulation Mechanism — the algorithm used to securely share a secret key between two
+                            parties</td>
+                        <td>Kyber768 creates a shared key</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Digital Signature</strong></td>
+                        <td>A mathematical proof that a message came from who it claims (like a tamper-proof seal)</td>
+                        <td>Dilithium3 signs a certificate</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TLS</strong></td>
+                        <td>Transport Layer Security — the "lock" icon in your browser. Encrypts data between your
+                            device and a server</td>
+                        <td>When you visit https://google.com</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SSH</strong></td>
+                        <td>Secure Shell — used by engineers to securely connect to remote servers</td>
+                        <td><code>ssh admin@server</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>IPsec</strong></td>
+                        <td>Internet Protocol Security — encrypts data between two networks (office A to office B)</td>
+                        <td>Corporate site-to-site VPN</td>
+                    </tr>
+                    <tr>
+                        <td><strong>VPN</strong></td>
+                        <td>Virtual Private Network — creates a secure "tunnel" for your internet traffic</td>
+                        <td>WireGuard, OpenVPN</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Handshake</strong></td>
+                        <td>The initial conversation between two computers where they agree on encryption</td>
+                        <td>"Let's use Kyber768" → "OK"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Latency</strong></td>
+                        <td>How long something takes (measured in milliseconds)</td>
+                        <td>2.3ms is fast</td>
+                    </tr>
+                    <tr>
+                        <td><strong>P50/P99</strong></td>
+                        <td>50th/99th percentile. P50 = half are faster. P99 = 99% are faster (catches worst cases)</td>
+                        <td>P50: 2.1ms, P99: 4.5ms</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Algorithm Names</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Type</th>
+                        <th>What It Does</th>
+                        <th>Standard</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="term green">Kyber768</span></td>
+                        <td>KEM</td>
+                        <td>Creates shared encryption keys. "768" = security level</td>
+                        <td>FIPS 203</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term green">Kyber1024</span></td>
+                        <td>KEM</td>
+                        <td>Same but stronger. Used for highest security (IPsec)</td>
+                        <td>FIPS 203</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">Dilithium3</span></td>
+                        <td>Signature</td>
+                        <td>Creates digital signatures to prove identity</td>
+                        <td>FIPS 204</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">Dilithium5</span></td>
+                        <td>Signature</td>
+                        <td>Stronger version. Used for root certificates</td>
+                        <td>FIPS 204</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term violet">SPHINCS+</span></td>
+                        <td>Signature</td>
+                        <td>Alternative to Dilithium. Slower but different math</td>
+                        <td>FIPS 205</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term violet">Falcon-512</span></td>
+                        <td>Signature</td>
+                        <td>Compact signatures. Smaller than Dilithium</td>
+                        <td>Evaluation</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term red">RSA-2048</span></td>
+                        <td>KEM/Sig</td>
+                        <td>The OLD algorithm. Vulnerable to quantum</td>
+                        <td>Deprecated</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term red">ECDSA/ECDH</span></td>
+                        <td>KEM/Sig</td>
+                        <td>Another OLD algorithm. Still quantum-vulnerable</td>
+                        <td>Deprecated</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Connection Modes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mode</th>
+                        <th>What It Means</th>
+                        <th>Security</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="term green">PQC-Only</span></td>
+                        <td>Uses ONLY quantum-resistant algorithms</td>
+                        <td>✅ Highest (quantum-safe)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term amber">Hybrid</span></td>
+                        <td>Uses BOTH quantum-safe AND classical together (belt AND suspenders)</td>
+                        <td>✅ High</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term red">Classical</span></td>
+                        <td>Uses ONLY old algorithms. Vulnerable to quantum</td>
+                        <td>❌ Unsafe</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Infrastructure Terms</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Term</th>
+                        <th>What It Means</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Bastion</strong></td>
+                        <td>A heavily secured gateway server — you must go through it to access other servers</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tunnel</strong></td>
+                        <td>An encrypted pathway between two networks (like a secure pipe for data)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SA</strong></td>
+                        <td>Security Association — an agreement about how to encrypt communication</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rekeying</strong></td>
+                        <td>When a tunnel creates new encryption keys (happens periodically for security)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Canary Rollout</strong></td>
+                        <td>Deploying a change to a small % first to test before full deployment</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CNSA 2.0</strong></td>
+                        <td>US government's required list of quantum-safe algorithms</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MTTR</strong></td>
+                        <td>Mean Time To Resolution — average time to fix an alert</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SLA</strong></td>
+                        <td>Service Level Agreement — a promise of reliability (e.g., 99.9% uptime)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="section" id="arch">
+            <h2><span class="icon">🏗️</span> 4. System Architecture</h2>
+            <pre><code>┌─────────────────────────────────────────────────┐
+│                   USER'S BROWSER                 │
+│                                                  │
+│   Next.js React Frontend (localhost:3000)         │
+│   ├── Landing Page (marketing)                    │
+│   ├── Login / Register                            │
+│   └── 12 Dashboard Pages                          │
+│       ├── Command Center    ├── Telemetry         │
+│       ├── TLS Monitor       ├── Inventory         │
+│       ├── SSH Bastions      ├── Policy Engine     │
+│       ├── IPsec Tunnels     ├── Key Vault         │
+│       ├── VPN Peers         ├── Audit Trail       │
+│       └── QoS Monitor       └── Settings          │
+└──────────────┬────────────────┬──────────────────┘
+               │ REST API        │ WebSocket
+               ▼                 ▼
+┌──────────────────────────────────────────────────┐
+│         FastAPI Backend (localhost:8000)           │
+│                                                   │
+│   Routes → Services → Scheduler → Database        │
+└──────────────────────┬───────────────────────────┘
+                       ▼
+┌──────────────────────────────────────────────────┐
+│              SQLite Database (pqc_shield.db)      │
+│              12 tables • File-based • Zero config │
+└──────────────────────────────────────────────────┘</code></pre>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="section" id="pipeline">
+            <h2><span class="icon">🔄</span> 5. The Data Pipeline</h2>
+
+            <h3>Every 1 Second — TLS Handshake</h3>
+            <div class="info-box green">
+                <div class="title">generate_tls_handshake()</div>
+                Pick algorithm: Kyber768 (75%), Kyber+X25519 (23%), Classic (2%)<br>
+                Generate latency: 1.2ms to 4.5ms<br>
+                Determine success/failure (99.7% success rate)<br>
+                → <strong>INSERT INTO tls_handshakes</strong> (record forever)<br>
+                → <strong>INSERT INTO active_tls_connections</strong> (live table)
+            </div>
+
+            <h3>Every 5 Seconds — Cleanup</h3>
+            <div class="info-box blue">
+                <div class="title">cleanup_stale_sessions()</div>
+                Mark connections inactive after 15s<br>
+                DELETE connections older than 60s
+            </div>
+
+            <h3>Every 10 Seconds — Alert Evaluation</h3>
+            <div class="info-box amber">
+                <div class="title">evaluate_alerts()</div>
+                Query last hour of handshakes → Calculate failure rate, P99 latency, fallback rate<br>
+                If failure_rate &gt; 1% → CREATE alert "FAILURE_RATE"<br>
+                If p99_latency &gt; 5ms → CREATE alert "LATENCY_SPIKE"<br>
+                If fallback_rate &gt; 15% → CREATE alert "EXCESSIVE_FALLBACK"<br>
+                If condition clears → RESOLVE the alert automatically
+            </div>
+
+            <h3>Every 15 Seconds — Escalation + Key Rotation</h3>
+            <div class="info-box red">
+                <div class="title">escalate_alerts() + auto_rotate_keys()</div>
+                Open alerts older than 60s: WARNING → HIGH<br>
+                Open alerts older than 180s: HIGH → CRITICAL<br><br>
+                Check each key's expiry. If expired + auto_rotate=true:<br>
+                → Reset expiry (45s for demo key, 180d for others)<br>
+                → Increment rotation_count<br>
+                → Record in key_rotation_history + audit log
+            </div>
+
+            <h3>Every 30 Seconds — QoS + Inventory Drift</h3>
+            <div class="info-box blue">
+                <div class="title">calculate_qos_metrics() + drift_inventory()</div>
+                Availability = (total - failures) / total × 100<br>
+                MTTR = average alert resolution time<br><br>
+                Slowly increase PQC readiness (+0-2% per asset)<br>
+                Occasionally expire certificates (2% chance)<br>
+                Occasionally migrate RSA assets to Kyber768 (1% chance)
+            </div>
+
+            <h3>Every 60 Seconds — Risk Snapshot</h3>
+            <div class="info-box amber">
+                <div class="title">persist_risk_snapshot()</div>
+                Calculate risk from: policy coverage, failure rate, fallback rate, latency<br>
+                Save snapshot to risk_history table
+            </div>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="section" id="pages">
+            <h2><span class="icon">📱</span> 6. Page-by-Page Breakdown</h2>
+
+            <h3>📊 Command Center <code>/dashboard</code></h3>
+            <p>A bird's-eye view of all 4 protocols. Shows 4 protocol cards with active connections, latency, success
+                rate, PQC %. TLS card shows <span class="term green">✓ Live DB</span>, others show <span
+                    class="term amber">⚠ Simulated</span>.</p>
+
+            <h3>🔒 TLS Monitor <code>/tls</code> — YOUR STRONGEST PAGE</h3>
+            <p>The most detailed page — a full real-time monitoring dashboard. Every number is a real SQL query.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>What It Shows</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>6 Stat Cards</td>
+                        <td>Handshakes/hr, Active Connections, P50/P99 Latency, Success Rate, Fallback Rate (with
+                            sparklines)</td>
+                    </tr>
+                    <tr>
+                        <td>Handshake Timeline</td>
+                        <td>Bar chart — 12 × 5-minute buckets showing volume over the last hour</td>
+                    </tr>
+                    <tr>
+                        <td>Mode Breakdown</td>
+                        <td>Donut chart — PQC-Only / Hybrid / Classical percentages</td>
+                    </tr>
+                    <tr>
+                        <td>P50 Latency Trend</td>
+                        <td>Line chart with animated pulse showing latency over time</td>
+                    </tr>
+                    <tr>
+                        <td>Live Handshake Feed</td>
+                        <td>Each handshake as it happens — algorithm, latency, success/failure — with entry animations
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>KEM Algorithm Usage</td>
+                        <td>Donut chart — Kyber768 vs Kyber768+X25519 vs Classic distribution</td>
+                    </tr>
+                    <tr>
+                        <td>Performance Bars</td>
+                        <td>Visual progress bars for success rate, failure rate, uptime</td>
+                    </tr>
+                    <tr>
+                        <td>Failure Analysis</td>
+                        <td>Failure count, fallback count, 24h volume cards</td>
+                    </tr>
+                    <tr>
+                        <td>Pipeline Health</td>
+                        <td>5-stage indicator: Scheduler → Generator → Database → API → Frontend</td>
+                    </tr>
+                    <tr>
+                        <td>Active Connections</td>
+                        <td>Table of every active TLS connection with source, dest, algorithm, mode, latency</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🖥️ SSH Bastions <code>/ssh</code></h3>
+            <p>Shows 4 SSH bastion hosts with session counts, CPU, memory, auth success rate, PQC %. Sessions persist
+                for 30s between refreshes. <span class="term amber">⚠ Simulated</span> (but stabilized with slow drift)
+            </p>
+
+            <h3>🔗 IPsec Tunnels <code>/ipsec</code></h3>
+            <p>9 fixed site-to-site tunnels (HQ-DC1 ↔ Branch-NYC, etc.) with IKE version, KEM, auth, cipher, mode, SA
+                lifetime. <span class="term amber">⚠ Simulated</span></p>
+
+            <h3>🌐 VPN Peers <code>/vpn</code></h3>
+            <p>15 fixed WireGuard peers with endpoint, tunnel IP, KEM, signature, mode, RX/TX bytes that slowly grow.
+                <span class="term amber">⚠ Simulated</span></p>
+
+            <h3>📈 Telemetry <code>/telemetry</code></h3>
+            <p>Analytics computed from TLS handshake data. P50/P99 latency, success rate, algorithm distribution. <span
+                    class="term green">✓ Live from DB</span></p>
+
+            <h3>📦 Inventory <code>/inventory</code></h3>
+            <p>50 network assets (TLS Gateways, SSH Bastions, App Servers, Load Balancers) with PQC readiness %. Drift
+                function slowly changes values every 30s. <span class="term green">✓ Live DB</span></p>
+
+            <h3>📜 Policy Engine <code>/policy</code></h3>
+            <p>Shows the "pqc-tls-mandate" policy requiring Kyber768 for all TLS Gateways. Compliance bar shows
+                progress. "Rollout 90%" button actually migrates non-compliant assets in the DB. <span
+                    class="term green">✓ Live DB</span></p>
+
+            <h3>🔑 Key Vault <code>/keys</code></h3>
+            <p>7 encryption keys (1 Root CA + 5 child + 1 demo). <code>DEMO-KEY-LIVE</code> auto-rotates every 45s —
+                watch the rotation count increment live. <span class="term green">✓ Live DB</span></p>
+
+            <h3>🔍 Audit Trail <code>/audit</code></h3>
+            <p>Every system event logged automatically — key rotations, alerts, logins, policy changes. Grows
+                continuously as the system runs. <span class="term green">✓ Live DB</span></p>
+
+            <h3>📈 QoS <code>/qos</code></h3>
+            <p>Service reliability — availability %, MTTR, failed handshakes (24h). Status: HEALTHY (&gt;99.9%),
+                DEGRADED (&gt;99%), CRITICAL (&lt;99%). <span class="term green">✓ Live DB</span></p>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="section" id="services">
+            <h2><span class="icon">⚙️</span> 7. Backend Services</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>File</th>
+                        <th>What It Does</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Telemetry</strong></td>
+                        <td><code>telemetry_service.py</code></td>
+                        <td>Generates TLS handshakes (1/sec), cleanup stale sessions, compute P50/P99</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alert Engine</strong></td>
+                        <td><code>alert_service.py</code></td>
+                        <td>Monitors failure rate/latency/fallback, creates/resolves/escalates alerts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Risk Calculator</strong></td>
+                        <td><code>risk_service.py</code></td>
+                        <td>Weighted risk score from 4 factors: coverage, failures, fallback, latency</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Key Manager</strong></td>
+                        <td><code>kms_service.py</code></td>
+                        <td>Seeds keys, auto-rotates expired keys, creates demo key (45s expiry)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Policy Engine</strong></td>
+                        <td><code>policy_service.py</code></td>
+                        <td>Seeds policies, calculates compliance, triggers rollout, enforces on handshakes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Inventory</strong></td>
+                        <td><code>inventory_service.py</code></td>
+                        <td>Seeds 50 assets, calculates metrics, drift function (PQC readiness changes)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>QoS</strong></td>
+                        <td><code>qos_service.py</code></td>
+                        <td>Calculates availability, MTTR, health status from handshake/alert data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Protocol Simulator</strong></td>
+                        <td><code>protocol_simulator.py</code></td>
+                        <td>Smooth-drift data for SSH/IPsec/VPN dashboard cards (sine waves, not random)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SSH Simulator</strong></td>
+                        <td><code>ssh_simulator.py</code></td>
+                        <td>Persistent bastion state, sessions refresh every 30s with incrementing durations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Audit Logger</strong></td>
+                        <td><code>audit_service.py</code></td>
+                        <td>Logs every significant event (rotations, violations, logins) to audit_log table</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 8 -->
+        <div class="section" id="tables">
+            <h2><span class="icon">🗄️</span> 8. Database Tables</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Table</th>
+                        <th>Purpose</th>
+                        <th>Growth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>tls_handshakes</code></td>
+                        <td>Every TLS handshake recorded</td>
+                        <td>~3,600/hour (1/sec)</td>
+                    </tr>
+                    <tr>
+                        <td><code>active_tls_connections</code></td>
+                        <td>Currently active connections</td>
+                        <td>~10-15 (cleaned every 5s)</td>
+                    </tr>
+                    <tr>
+                        <td><code>inventory_assets</code></td>
+                        <td>Network devices and servers</td>
+                        <td>50 on startup, slowly evolves</td>
+                    </tr>
+                    <tr>
+                        <td><code>policies</code></td>
+                        <td>Migration enforcement rules</td>
+                        <td>1 on startup</td>
+                    </tr>
+                    <tr>
+                        <td><code>keys</code></td>
+                        <td>Encryption keys</td>
+                        <td>7 on startup</td>
+                    </tr>
+                    <tr>
+                        <td><code>key_rotation_history</code></td>
+                        <td>Every key rotation event</td>
+                        <td>Grows with each rotation</td>
+                    </tr>
+                    <tr>
+                        <td><code>alerts</code></td>
+                        <td>Active and resolved alerts</td>
+                        <td>Grows/resolves over time</td>
+                    </tr>
+                    <tr>
+                        <td><code>audit_log</code></td>
+                        <td>Every system event</td>
+                        <td>Grows continuously</td>
+                    </tr>
+                    <tr>
+                        <td><code>risk_history</code></td>
+                        <td>Risk score snapshots</td>
+                        <td>1 per minute</td>
+                    </tr>
+                    <tr>
+                        <td><code>qos_metrics</code></td>
+                        <td>SLA measurements</td>
+                        <td>1 per 30 seconds</td>
+                    </tr>
+                    <tr>
+                        <td><code>metrics_snapshots</code></td>
+                        <td>Aggregated stats</td>
+                        <td>1 per 5 minutes</td>
+                    </tr>
+                    <tr>
+                        <td><code>users</code></td>
+                        <td>Registered accounts</td>
+                        <td>Manual registration</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 9 -->
+        <div class="section" id="api">
+            <h2><span class="icon">🔌</span> 9. API Endpoints</h2>
+
+            <h3>Authentication</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="term green">POST</span></td>
+                        <td><code>/api/auth/register</code></td>
+                        <td>Create a new user account</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term green">POST</span></td>
+                        <td><code>/api/auth/login</code></td>
+                        <td>Login and get JWT token</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Core Data</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/protocols/overview</code></td>
+                        <td>All 4 protocol stats</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/tls/active-connections</code></td>
+                        <td>Active TLS connections</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/telemetry/performance</code></td>
+                        <td>P50, P99 latency, success rate</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/telemetry/handshake-timeline</code></td>
+                        <td>5-min bucketed volumes</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/telemetry/mode-breakdown</code></td>
+                        <td>PQC-Only / Hybrid / Classic %</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/telemetry/algorithm-usage</code></td>
+                        <td>KEM algorithm distribution</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/telemetry/failure-analysis</code></td>
+                        <td>Failure + fallback counts</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/telemetry/pipeline-status</code></td>
+                        <td>Pipeline health check</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/ssh/bastions</code></td>
+                        <td>SSH bastion host list</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/ssh/sessions</code></td>
+                        <td>Active SSH sessions</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/inventory/assets</code></td>
+                        <td>All network assets</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/kms/keys</code></td>
+                        <td>All keys with history</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term green">POST</span></td>
+                        <td><code>/api/kms/rotate/{key_id}</code></td>
+                        <td>Manually rotate a key</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/policy/coverage/{name}</code></td>
+                        <td>Policy compliance %</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term green">POST</span></td>
+                        <td><code>/api/policy/rollout/{name}</code></td>
+                        <td>Trigger policy rollout</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/alerts/</code></td>
+                        <td>All alerts</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/audit/</code></td>
+                        <td>All audit events</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/risk/score</code></td>
+                        <td>Risk score + factors</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/api/qos/metrics</code></td>
+                        <td>Availability, MTTR, status</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term blue">GET</span></td>
+                        <td><code>/metrics</code></td>
+                        <td>Prometheus-compatible export</td>
+                    </tr>
+                    <tr>
+                        <td><span class="term violet">WS</span></td>
+                        <td><code>/ws</code></td>
+                        <td>Real-time WebSocket feed</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 10 -->
+        <div class="section" id="jobs">
+            <h2><span class="icon">⏱️</span> 10. Scheduled Jobs</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Job</th>
+                        <th>Interval</th>
+                        <th>What It Does</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>generate_tls_handshake</code></td>
+                        <td>1 second</td>
+                        <td>Creates a TLS handshake and saves to SQLite</td>
+                    </tr>
+                    <tr>
+                        <td><code>cleanup_stale_sessions</code></td>
+                        <td>5 seconds</td>
+                        <td>Marks inactive connections, deletes old ones</td>
+                    </tr>
+                    <tr>
+                        <td><code>evaluate_alerts</code></td>
+                        <td>10 seconds</td>
+                        <td>Checks failure rate, latency, fallback → creates/resolves alerts</td>
+                    </tr>
+                    <tr>
+                        <td><code>escalate_alerts</code></td>
+                        <td>15 seconds</td>
+                        <td>WARNING → HIGH → CRITICAL based on alert age</td>
+                    </tr>
+                    <tr>
+                        <td><code>auto_rotate_keys</code></td>
+                        <td>15 seconds</td>
+                        <td>Rotates expired keys, logs events</td>
+                    </tr>
+                    <tr>
+                        <td><code>calculate_qos_metrics</code></td>
+                        <td>30 seconds</td>
+                        <td>Recalculates availability, MTTR, health</td>
+                    </tr>
+                    <tr>
+                        <td><code>drift_inventory</code></td>
+                        <td>30 seconds</td>
+                        <td>PQC readiness drift, cert expiry, RSA migration</td>
+                    </tr>
+                    <tr>
+                        <td><code>persist_risk_snapshot</code></td>
+                        <td>60 seconds</td>
+                        <td>Saves risk score to history</td>
+                    </tr>
+                    <tr>
+                        <td><code>persist_metrics_snapshot</code></td>
+                        <td>5 minutes</td>
+                        <td>Saves aggregated metrics</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 11 -->
+        <div class="section" id="auth">
+            <h2><span class="icon">🔐</span> 11. Authentication Flow</h2>
+            <pre><code>1. User visits localhost:3000
+2. Redirected to /login if no JWT token in sessionStorage
+3. User registers: POST /api/auth/register → creates user in DB
+4. User logs in: POST /api/auth/login → returns JWT token
+5. JWT stored in sessionStorage
+6. Every API call includes: Authorization: Bearer &lt;token&gt;
+7. Backend validates JWT on protected routes
+8. Token expires after 24 hours → must login again</code></pre>
+        </div>
+
+        <!-- Section 12 -->
+        <div class="section" id="stack">
+            <h2><span class="icon">🛠️</span> 12. Technology Stack</h2>
+
+            <h3>Frontend</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Next.js 14</strong></td>
+                        <td>React framework with file-based routing</td>
+                    </tr>
+                    <tr>
+                        <td><strong>React 18</strong></td>
+                        <td>UI component library</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tailwind CSS</strong></td>
+                        <td>Utility-first CSS styling</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Framer Motion</strong></td>
+                        <td>Smooth animations and transitions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lucide React</strong></td>
+                        <td>Icon library</td>
+                    </tr>
+                    <tr>
+                        <td><strong>shadcn/ui</strong></td>
+                        <td>Pre-built UI components</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Backend</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>FastAPI</strong></td>
+                        <td>Python web framework for REST APIs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SQLAlchemy</strong></td>
+                        <td>Database ORM</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SQLite</strong></td>
+                        <td>Lightweight file-based database</td>
+                    </tr>
+                    <tr>
+                        <td><strong>APScheduler</strong></td>
+                        <td>Background task scheduling</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Uvicorn</strong></td>
+                        <td>ASGI server</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Python-JOSE</strong></td>
+                        <td>JWT token handling</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bcrypt</strong></td>
+                        <td>Password hashing</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 13 -->
+        <div class="section" id="algos">
+            <h2><span class="icon">🧬</span> 13. Algorithms &amp; Standards</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Standard</th>
+                        <th>Algorithm</th>
+                        <th>Type</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>FIPS 203</strong></td>
+                        <td>ML-KEM (Kyber)</td>
+                        <td>Key Encapsulation</td>
+                        <td>Securely exchanging encryption keys</td>
+                    </tr>
+                    <tr>
+                        <td><strong>FIPS 204</strong></td>
+                        <td>ML-DSA (Dilithium)</td>
+                        <td>Digital Signature</td>
+                        <td>Proving identity, signing certificates</td>
+                    </tr>
+                    <tr>
+                        <td><strong>FIPS 205</strong></td>
+                        <td>SLH-DSA (SPHINCS+)</td>
+                        <td>Digital Signature</td>
+                        <td>Alternative signature with different math</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>CNSA 2.0 Timeline</h3>
+            <div class="info-box amber">
+                <strong>2025:</strong> Begin transitioning to PQC algorithms<br>
+                <strong>2030:</strong> All new systems must use PQC<br>
+                <strong>2033:</strong> All existing systems must be migrated<br>
+                <strong>2035:</strong> Classical algorithms fully prohibited
+            </div>
+        </div>
+
+        <!-- Section 14 -->
+        <div class="section" id="datasrc">
+            <h2><span class="icon">📡</span> 14. Data Sources — Live vs Simulated</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Page</th>
+                        <th>Badge</th>
+                        <th>Data Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dashboard (TLS card)</td>
+                        <td><span class="term green">✓ Live DB</span></td>
+                        <td>SQLite <code>tls_handshakes</code></td>
+                    </tr>
+                    <tr>
+                        <td>Dashboard (SSH/IPsec/VPN)</td>
+                        <td><span class="term amber">⚠ Simulated</span></td>
+                        <td><code>protocol_simulator.py</code></td>
+                    </tr>
+                    <tr>
+                        <td>TLS</td>
+                        <td><span class="term green">● Live</span></td>
+                        <td>SQLite <code>tls_handshakes</code> + <code>active_tls_connections</code></td>
+                    </tr>
+                    <tr>
+                        <td>Telemetry</td>
+                        <td><span class="term green">Live from DB</span></td>
+                        <td>SQLite <code>tls_handshakes</code></td>
+                    </tr>
+                    <tr>
+                        <td>SSH</td>
+                        <td><span class="term amber">⚠ Simulated</span></td>
+                        <td><code>ssh_simulator.py</code></td>
+                    </tr>
+                    <tr>
+                        <td>IPsec</td>
+                        <td><span class="term amber">⚠ Simulated</span></td>
+                        <td><code>protocol_simulator.py</code></td>
+                    </tr>
+                    <tr>
+                        <td>VPN</td>
+                        <td><span class="term amber">⚠ Simulated</span></td>
+                        <td><code>protocol_simulator.py</code></td>
+                    </tr>
+                    <tr>
+                        <td>Inventory</td>
+                        <td><span class="term green">✓ Live DB</span></td>
+                        <td>SQLite <code>inventory_assets</code></td>
+                    </tr>
+                    <tr>
+                        <td>Policy</td>
+                        <td><span class="term green">✓ Live DB</span></td>
+                        <td>SQLite <code>policies</code> + <code>inventory_assets</code></td>
+                    </tr>
+                    <tr>
+                        <td>Key Vault</td>
+                        <td><span class="term green">✓ Live DB</span></td>
+                        <td>SQLite <code>keys</code></td>
+                    </tr>
+                    <tr>
+                        <td>Audit Trail</td>
+                        <td><span class="term green">✓ Live DB</span></td>
+                        <td>SQLite <code>audit_log</code></td>
+                    </tr>
+                    <tr>
+                        <td>QoS</td>
+                        <td><span class="term green">✓ Live DB</span></td>
+                        <td>SQLite <code>qos_metrics</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 15 -->
+        <div class="section" id="risk">
+            <h2><span class="icon">⚖️</span> 15. Risk Scoring Formula</h2>
+            <pre><code>Risk Score (0-100) = Weighted sum of 4 factors:
+
+┌─────────────────────────┬────────┬────────────────────────────────────┐
+│ Factor                  │ Weight │ Calculation                         │
+├─────────────────────────┼────────┼────────────────────────────────────┤
+│ Policy Coverage Risk    │  40%   │ 100 - compliance_percentage         │
+│ Fallback Rate           │  25%   │ classical_handshakes / total × 100  │
+│ Failure Rate            │  20%   │ failed_handshakes / total × 100     │
+│ Latency Risk            │  15%   │ min(P99_latency × 5, 100)           │
+└─────────────────────────┴────────┴────────────────────────────────────┘
+
+Example:
+  Policy Compliance = 47%  → Coverage Risk = 53
+  Fallback Rate     = 2%   → 2
+  Failure Rate      = 0.3% → 0.3
+  P99 Latency       = 4.2ms → min(21, 100) = 21
+
+  Risk = (53 × 0.4) + (2 × 0.25) + (0.3 × 0.2) + (21 × 0.15)
+       = 21.2 + 0.5 + 0.06 + 3.15
+       = 24.91 → LOW risk</code></pre>
+
+            <div class="card-grid">
+                <div class="card" style="border-left: 3px solid var(--accent-green);">
+                    <div class="label">LOW</div>
+                    <div class="value" style="color: var(--accent-green);">0–30</div>
+                    <div class="desc">Everything is well-protected</div>
+                </div>
+                <div class="card" style="border-left: 3px solid var(--accent-amber);">
+                    <div class="label">MEDIUM</div>
+                    <div class="value" style="color: var(--accent-amber);">30–70</div>
+                    <div class="desc">Some areas need attention</div>
+                </div>
+                <div class="card" style="border-left: 3px solid var(--accent-red);">
+                    <div class="label">HIGH</div>
+                    <div class="value" style="color: var(--accent-red);">70–100</div>
+                    <div class="desc">Significant vulnerability</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 16 -->
+        <div class="section" id="deploy">
+            <h2><span class="icon">🚀</span> 16. Deployment Guide</h2>
+
+            <h3>Prerequisites</h3>
+            <ul>
+                <li><strong>Node.js</strong> 18+ (for frontend)</li>
+                <li><strong>Python</strong> 3.9+ (for backend)</li>
+                <li><strong>npm</strong> (comes with Node.js)</li>
+                <li><strong>pip</strong> (comes with Python)</li>
+            </ul>
+
+            <h3>Starting the Backend</h3>
+            <pre><code>cd pqc-shield-backend/pqc-shield-backend
+pip install -r requirements.txt
+py -m uvicorn app.main:app --reload --port 8000</code></pre>
+            <div class="info-box green">
+                <div class="title">What happens on startup:</div>
+                1. SQLite database created (if not exists)<br>
+                2. All tables created (via SQLAlchemy)<br>
+                3. 50 inventory assets seeded<br>
+                4. 1 migration policy seeded<br>
+                5. 6 encryption keys + 1 demo key seeded<br>
+                6. Scheduler starts all 9 background jobs
+            </div>
+
+            <h3>Starting the Frontend</h3>
+            <pre><code>cd pqc-shield-final/pqc-shield-next
+npm install
+npm run dev</code></pre>
+            <p>Opens at <strong>http://localhost:3000</strong></p>
+
+            <h3>For a Fresh Demo</h3>
+            <pre><code># Stop the backend first, then:
+del pqc_shield.db
+py -m uvicorn app.main:app --reload --port 8000</code></pre>
+
+            <hr>
+            <p style="text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 40px;">
+                Quansec's PQC v1.0 • March 2026 • Built with FastAPI + Next.js + SQLite
+            </p>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
